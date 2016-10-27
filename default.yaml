@@ -1,0 +1,156 @@
+# Author @patriciogv - 2015
+
+import:
+    - https://tangrams.github.io/blocks/global.yaml
+    - https://tangrams.github.io/blocks/filter/height.yaml
+    - https://tangrams.github.io/blocks/patterns/stripes.yaml
+    - https://tangrams.github.io/blocks/filter/grain.yaml
+    - https://tangrams.github.io/blocks/space/constant.yaml
+
+sources:
+    mapzen:
+        type: TopoJSON
+        # prod
+        url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
+        # dev
+        #url:  https://tile.dev.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson
+        rasters: [normals]
+        max_zoom: 16
+    normals: # normals
+        type: Raster
+        url: https://tile.mapzen.com/mapzen/terrain/v1/normal/{z}/{x}/{y}.png
+        max_zoom: 15
+
+cameras:
+    cam:
+        type: perspective
+        # vanishing_point: [0, -500]
+
+lights:
+    dir:
+        type: directional
+        direction: [.1, .5, -1]
+        diffuse: .7
+        ambient: .5
+
+layers:
+    water:
+        data: { source: mapzen }
+        draw:
+            water:
+                order: global.order
+                color: [0.165, 0.169, 0.212, 1.00]
+    earth:
+        data: { source: mapzen }
+        draw:
+            earth:
+                order: global.order
+                color: [0.467, 0.388, 0.337, 1.00]
+    landuse:
+        data: { source: mapzen }
+        draw:
+            landuse:
+                order: global.order
+                color: [0.424, 0.180, 0.161, 1.00]
+    roads:
+        data: { source: mapzen }
+        filter: { not: { kind: [rail, ferry] } }
+        draw:
+            roads:
+                order: global.order
+                color: [0.988, 0.988, 0.988]
+                width: [[7,0.0px], [10, .5px], [15, .75px], [17, 5m]]
+        highway:
+            filter: { kind: highway }
+            draw:
+                roads:
+                    order: global.order
+                    width: [[8,0px], [8,.25px], [11, 1.5px], [14, 2px], [16, 4px], [17, 10m]]
+            link:
+                filter: { is_link: true } # on- and off-ramps, etc
+                draw:
+                    roads:
+                        width: [[8,0px], [14, 3px], [16, 5px], [18, 10m]]
+                tunnel-link:
+                    filter: {is_tunnel: true, $zoom: {min: 13} }
+        tunnel:
+            filter: {is_tunnel: true }
+            draw:
+                roads:
+                    order: global.order
+    buildings:
+        data: { source: mapzen }
+        draw:
+            buildings:
+                order: global.order
+                color: '#999'
+                extrude: true
+styles:
+    water:
+        base: polygons
+    earth:
+        data: { source: mapzen}
+        draw:
+            terrain:
+                order: function() { return feature.sort_rank; }
+                color: [1.0, 1.0, 1.0]
+    landuse:
+        base: polygons
+        mix: [patterns-stripes, space-constant]
+        blend: inlay
+        shaders:
+            defines:
+                GRAIN_AMOUNT: 2.
+                NUM_OCTAVES: 2
+            blocks:
+                color: |
+                    color = mix(color,vec4(0.),diagonalStripes( getConstantCoords()*13.))*.75;
+    roads:
+        base: lines
+        lighting: false
+    buildings:
+        base: polygons
+        mix: [filter-height]
+    
+    terrain:
+        base: polygons
+        lighting: false
+        raster: normal
+        shaders:
+            uniforms:
+                # u_envmap: images/relief-shading-environment-map.jpg
+                u_envmap: img/draw-test9.jpg
+                u_contrast: 1.
+                u_brightness: 1.
+            blocks:
+                global: |
+                    // Simplified view-independent environment map
+                    vec4 terrainEnvmap (in sampler2D _tex, in vec3 _normal) {
+                        const vec3 eye = vec3(0.,0.,-1.);
+                        vec3 r = reflect(eye, _normal);
+                        r.z += 1.;
+                        float m = 2. * length(r);
+                        vec2 uv = r.xy / m + .5;
+                        return texture2D(_tex, uv);
+                    }
+                    const float e = 2.71828;
+                color: |
+                    // scale up normals with a function
+                    // https://www.desmos.com/calculator/bv4mzh8erz
+                    //float scale = 10./(u_map_position.z-.7) + 1.8;
+                    float scale1 = 20./(u_map_position.z) + 1.5;
+                    normal.z /= scale1; // turn terrain exaggeration up/down
+                    // fade out spheremap normals with a function
+                    // https://www.desmos.com/calculator/ptgkzcnfyc
+                    float m = 3.5 * (u_map_position.z - 0.8) * pow(e, u_map_position.z * -.29);
+                    m = clamp(m, 0., 1.5);
+                    color = terrainEnvmap(u_envmap, normal);
+
+                    // Apply contrast
+                    float contrast = m;
+                    color.rgb = ((color.rgb - 0.5) * max(contrast, 0.)) + 0.5;
+                    // Apply brightness
+                    float brightness = .5 - m * .5;
+                    color.rgb += brightness;
+
+                    color *= v_color; // apply layer color
