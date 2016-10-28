@@ -20,12 +20,6 @@ var map = L.Mapzen.map('map', {
   scene: './default.yaml'
 }).setView([37.7627084265813,-122.43644714355469], 13)
 
-
-
-
-
-
-
 var data = horrorArr;//JSON.parse(request.responseText);
 var waypoints = [];
 var names = [];
@@ -51,6 +45,7 @@ function setupRoutingControl () {
 //  var emojis = ['👊', '😃', '🌽', '⭐', '🐟', '🐴', '🐷', '🐔', '😜', '🔥', '🐶', '😮', '👍', '😎', '🏄' ];
   control = L.Routing.control({
     plan: L.Routing.plan(routingData.waypoints, {
+      draggableWaypoints: false,
       // createMarker: function(i, wp, n) {
       // // if (i === 0) {
       //   return L.marker(wp.latLng, {
@@ -62,16 +57,13 @@ function setupRoutingControl () {
       //       html: 'LA'})
       //   });
       // },
-      addWaypoints: false,
-      // You can get your own Mapzen turn-by-turn & search API key from the Mapzen developer portal (https://mapzen.com/developers/)
-      geocoder: L.Control.Geocoder.mapzen('search-WV8RJru')
+      addWaypoints: false
     }),
     // Draw SVG route while waiting for Tangram to be loaded
     lineOptions: {
       styles: [{ color: '#fcc', opacity: 0.9, weight: 7 }]
     },
     show: (map.getSize().x > 768)? true: false,
-    draggableWaypoints: false,
     waypoints: routingData.waypoints,
     router: L.Routing.mapzen('matrix-Yxnzyp9', {costing: routingData.costing}),
     formatter: new L.Routing.mapzenFormatter(),
