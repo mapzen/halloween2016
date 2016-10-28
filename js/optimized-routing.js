@@ -21,11 +21,6 @@ var map = L.Mapzen.map('map', {
 }).setView([37.7627084265813,-122.43644714355469], 13)
 
 
-
-
-
-
-
 var data = horrorArr;//JSON.parse(request.responseText);
 var waypoints = [];
 var names = [];
@@ -35,9 +30,7 @@ for (var i = 0; i< data.length; i++) {
   var place = data[i];
   waypoints.push(L.latLng(place.lat, place.lng));
   names.push(place.movie);
-
 }
-
 
 routingData.waypoints = waypoints;
 routingData.initialName = names;
