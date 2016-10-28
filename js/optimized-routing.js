@@ -72,3 +72,13 @@ function setupRoutingControl () {
 
   L.Routing.errorControl(control).addTo(map);
 }
+
+// If you want extra display
+
+var lrmContainer = document.querySelector('.leaflet-routing-container');
+var places = document.createElement('div');
+ // '<div class="place-names"></div>';
+ places.classList.add('place-names');
+lrmContainer.appendChild(places);
+
+
