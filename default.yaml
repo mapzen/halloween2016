@@ -12,8 +12,8 @@ sources:
     mapzen:
         type: TopoJSON
         # prod
-        #url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
-        url:  https://vector.mapzen.com/osm/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
+        url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
+        #url:  https://vector.mapzen.com/osm/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
         # dev
         #url:  https://tile.dev.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson
         rasters: [normals]
@@ -22,7 +22,13 @@ sources:
         type: Raster
         url: https://tile.mapzen.com/mapzen/terrain/v1/normal/{z}/{x}/{y}.png?api_key=vector-tiles-VyYjZGS
         max_zoom: 15
-
+fonts:
+    Headhunter:
+      url: fonts/Headhunter-Regular.ttf
+    Montserrat:
+      url: fonts/Montserrat-Regular.ttf
+    Creepster:
+      url: fonts/Creepster-Regular.ttf
 cameras:
     cam:
         type: perspective
@@ -35,38 +41,72 @@ lights:
         diffuse: .7
         ambient: .5
 
-# scene:
-#     background:
-#       color: blue
+scene:
+    background:
+      color: grey
 
 layers:
     water:
-        data: { source: mapzen, layer: water }
+        data: { source: mapzen }
         filter:
-          all:
-              - kind: [ocean, lake, water, riverbank, reservoir, swimming_pool]
+          not:
+            - boundary: true
+            - kind: playa
         draw:
             waves:
-                order: global.order
+                order: function() { return feature.sort_rank; }
                 cap: round
                 width: 8px
                 color: [0.502, 0.486, 0.486, 1.00]
                 width: 5px
+
     earth:
         data: { source: mapzen }
         filter: { not: { boundary: true } }
         draw:
             terrain:
                 order: function() { return feature.sort_rank; }
-                #color: [1.0, 1.0, 1.0]
-            # polygons:
-            #     color: red
-            #     order: function() { return feature.sort_rank; }
-    landuse:
+    boundaries:
         data: { source: mapzen }
         draw:
-            terrain:
+            lines:
                 order: function() { return feature.sort_rank; }
+                visible: global.lines
+                color: [.10, .10, .10, .60]
+                width: .75px
+    places:
+        data: { source: mapzen }
+        filter: { not: { kind: [neighbourhood] } }
+        countries:
+            filter: { kind: country }
+            draw:
+                text:
+                  font:
+                    family: Headhunter
+                    size: 40px
+        # cities:
+        #     filter: { not: { kind: [country, state] } }
+        #     also:
+        #         filter:
+        #             any:
+        #                 - $zoom: { min: 6, max: 8 }
+        #                 - { labelrank: {min: 5}, $zoom: { max: 6 }}
+        #                 - { population: { min: 100000 } , $zoom: {min: 8 } }
+        #                 - { population: { min: 50000 } , $zoom: {min: 12 } }
+        #         draw:
+        #             text:
+        #               font:
+        #                 family: Headhunter
+        #                 size: 18px
+        states:
+            filter:
+                - kind: state
+                  $zoom: { min: 6 }
+            draw:
+                text:
+                  font:
+                    family: Montserrat
+                    size: 18px
     roads:
         data: { source: mapzen }
         filter: { not: { kind: [rail, ferry] } }
@@ -105,8 +145,6 @@ styles:
         shaders:
             blocks:
                 global: |
-                    // Common Values
-                    //================================
                     float radio = 0.05;
                     vec2 size = vec2(1.,.6);
                     vec3 background = vec3(1.);
