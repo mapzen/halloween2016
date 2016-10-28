@@ -46,17 +46,17 @@ function setupRoutingControl () {
   control = L.Routing.control({
     plan: L.Routing.plan(routingData.waypoints, {
       draggableWaypoints: false,
-      // createMarker: function(i, wp, n) {
-      // // if (i === 0) {
-      //   return L.marker(wp.latLng, {
-      //     draggable: true,
-      //     icon: new L.divIcon({
-      //       iconSize: [30, 30],
-      //       iconAnchor: [15, 15],
-      //       className: 'icon-marker waypoint'+i,
-      //       html: 'LA'})
-      //   });
-      // },
+      createMarker: function(i, wp, n) {
+      // if (i === 0) {
+        return L.marker(wp.latLng, {
+          draggable: true,
+          icon: new L.divIcon({
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+            className: 'point-marker',
+            html: names[i]})
+        });
+      },
       addWaypoints: false
     }),
     // Draw SVG route while waiting for Tangram to be loaded
