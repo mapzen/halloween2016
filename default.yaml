@@ -23,8 +23,6 @@ sources:
         url: https://tile.mapzen.com/mapzen/terrain/v1/normal/{z}/{x}/{y}.png?api_key=vector-tiles-VyYjZGS
         max_zoom: 15
 fonts:
-    Headhunter:
-      url: fonts/Headhunter-Regular.ttf
     Montserrat:
       url: fonts/Montserrat-Regular.ttf
     Creepster:
@@ -69,44 +67,45 @@ layers:
     boundaries:
         data: { source: mapzen }
         draw:
-            lines:
+            dots:
                 order: function() { return feature.sort_rank; }
                 visible: global.lines
-                color: [.10, .10, .10, .60]
-                width: .75px
+                color: '#B22C18'
+                width: 1.5px
     places:
         data: { source: mapzen }
         filter: { not: { kind: [neighbourhood] } }
         countries:
-            filter: { kind: country }
+            filter: { kind: country, population: { min: 3500000 } }
             draw:
                 text:
+                  text_source: function() { return feature["name:en"] || feature["name"]; }
                   font:
-                    family: Headhunter
-                    size: 40px
-        # cities:
-        #     filter: { not: { kind: [country, state] } }
-        #     also:
-        #         filter:
-        #             any:
-        #                 - $zoom: { min: 6, max: 8 }
-        #                 - { labelrank: {min: 5}, $zoom: { max: 6 }}
-        #                 - { population: { min: 100000 } , $zoom: {min: 8 } }
-        #                 - { population: { min: 50000 } , $zoom: {min: 12 } }
-        #         draw:
-        #             text:
-        #               font:
-        #                 family: Headhunter
-        #                 size: 18px
-        states:
+                    family: Creepster
+                    size: 30px
+                    fill: '#B82D18'
+        cities:
             filter:
-                - kind: state
+                - kind_detail: city
                   $zoom: { min: 6 }
             draw:
                 text:
                   font:
-                    family: Montserrat
-                    size: 18px
+                    family: Creepster
+                    size: 24px
+                    fill: '#962825'
+                    stroke: { color: [.185,.118,.038], width: 3}
+        states:
+            filter:
+                - kind_detail: state
+                  $zoom: { min: 6 }
+            draw:
+                text:
+                  font:
+                    family: Creepster
+                    size: [[6, 12px], [7,24px], [8, 36px], [9, 44px]]
+                    fill: '#FF7A12'
+                    stroke: { color: [.155,.155,.155], width: 3}
     roads:
         data: { source: mapzen }
         filter: { not: { kind: [rail, ferry] } }
@@ -156,6 +155,9 @@ styles:
     buildings:
         base: polygons
         mix: [filter-height]
+    dots:
+        base: lines
+        dash: [1, 2]
     terrain:
         base: polygons
         lighting: false
@@ -164,7 +166,7 @@ styles:
         shaders:
             uniforms:
                 u_scale: 1 # higher values are more exaggerated
-                u_envmap: img/sphere-map1.png
+                u_envmap: img/sphere-map2.png
             blocks:
                 global: |
                     vec4 terrainEnvmap (in sampler2D _tex, in vec3 _normal) {
@@ -187,8 +189,8 @@ styles:
         mix: [space-constant, patterns-stripes]
         shaders:
             defines:
-                COLOR1: vec3(0.490, 0.475, 0.475)
-                COLOR2: vec3(0.380, 0.353, 0.353)
+                COLOR1: vec3(0.25, 0.25, 0.25)
+                COLOR2: vec3(0.69, .69, .69)
             blocks:
                 global: |
                     float stripes2(vec2 st){
