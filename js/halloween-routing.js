@@ -4,6 +4,54 @@ var routingData = {};
 var control;
 var plan;
 
+// Slight fun
+
+
+var context = null;
+var bufferLoader, source;
+// window.addEventListener('load', init, false);
+
+function initSound() {
+  try {
+    // Fix up for prefixing
+    if (context === null) {
+    window.AudioContext = window.AudioContext||window.webkitAudioContext;
+    context = new AudioContext();
+      bufferLoader = new BufferLoader(
+        context,
+        [
+          './img/scream.mp3'
+        ],
+        finishedLoading
+      );
+
+    bufferLoader.load();
+  } else {
+    bufferLoader = new BufferLoader(
+        context,
+        [
+          './img/haha.mp3'
+        ],
+        finishedLoading
+      );
+
+    bufferLoader.load();
+  }
+  }
+  catch(e) {
+    console.log(e);
+  }
+}
+
+function finishedLoading(bufferList) {
+  // Create two sources and play them both together.
+  source = context.createBufferSource();
+  source.buffer = bufferList[0];
+  source.connect(context.destination);
+  source.start(0);
+}
+
+
 var map = L.Mapzen.map('map', {
   minZoom: 5,
   maxZoom: 10,
@@ -174,7 +222,7 @@ map.on('tangramloaded', function (e) {
 
 function makePlaceUl (namearr) {
   var ulNode = document.createElement('ul');
-  for ( var i = 0; i < namearr.length; i++) {
+  for ( var i = 0; i < namearr.length-1; i++) {
     ulNode.appendChild(makePlaceLi(namearr[i], addrs[i], waypoints[i]));
   }
   return ulNode;
@@ -190,6 +238,7 @@ function makePlaceLi (name, addr, waypoint) {
   lNode.appendChild(addrNode);
   lNode.onclick = function () {
     map.setView(waypoint, 10);
+    initSound();
   }
   return lNode;
 }
