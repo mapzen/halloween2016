@@ -6,7 +6,8 @@ var plan;
 
 var map = L.Mapzen.map('map', {
   minZoom: 4,
-  maxZoom: 10,
+  maxZoom: 15,
+  scrollWheelZoom: false,
   scene: './default.yaml'
 });
 

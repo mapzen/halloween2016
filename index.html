@@ -60,14 +60,19 @@
             cursor: url('./img/bat.png'), default;
         }
         .place-names ul {
-            padding-left: 15px;
+            padding: 0;
+            margin: 0;
         }
         .place-names ul li {
             list-style: none;
             color: #B22C18;
             font-size: 16px;
             line-height: 0.9;
-            padding-bottom: 10px;
+            padding: 5px 5px 5px 15px;
+        }
+        .place-names ul li:hover {
+            background-color: #B22C18;
+            color: #333;
         }
         .place-addr {
             color: #333;
@@ -81,7 +86,7 @@
     <div id="map"></div>
     <script src="https://mapzen.com/js/mapzen.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.4/leaflet-routing-machine.min.js"></script>
-    <script src="https://unpkg.com/lrm-mapzen@1.1.4/dist/lrm-mapzen.js"></script>
+    <script src="./js/lrm.patched.js"></script>
     <script src="./js/mapzen-horror-road-trip.js"></script>
     <script src="./js/halloween-routing.js"></script>
   </body>
