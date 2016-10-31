@@ -12,8 +12,8 @@ sources:
     mapzen:
         type: TopoJSON
         # prod
-        #url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
-        url:  https://vector.mapzen.com/osm/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
+        url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
+        #url:  https://vector.mapzen.com/osm/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
         # dev
         #url:  https://tile.dev.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson
         rasters: [normals]
@@ -22,7 +22,11 @@ sources:
         type: Raster
         url: https://tile.mapzen.com/mapzen/terrain/v1/normal/{z}/{x}/{y}.png?api_key=vector-tiles-VyYjZGS
         max_zoom: 15
-
+fonts:
+    Montserrat:
+      url: fonts/Montserrat-Regular.ttf
+    Creepster:
+      url: fonts/Creepster-Regular.ttf
 cameras:
     cam:
         type: perspective
@@ -35,38 +39,87 @@ lights:
         diffuse: .7
         ambient: .5
 
-# scene:
-#     background:
-#       color: blue
+scene:
+    background:
+      color: grey
 
 layers:
     water:
-        data: { source: mapzen, layer: water }
+        data: { source: mapzen }
         filter:
-          all:
-              - kind: [ocean, lake, water, riverbank, reservoir, swimming_pool]
+          not:
+            - boundary: true
+            - kind: playa
         draw:
             waves:
-                order: global.order
+                order: function() { return feature.sort_rank; }
                 cap: round
                 width: 8px
                 color: [0.502, 0.486, 0.486, 1.00]
                 width: 5px
+    landuse:
+        data: { source: mapzen }
+        draw:
+            landuse:
+                color: rgb(99,27,24)
+                order: function() { return feature.sort_rank; }
     earth:
         data: { source: mapzen }
         filter: { not: { boundary: true } }
         draw:
             terrain:
                 order: function() { return feature.sort_rank; }
-                #color: [1.0, 1.0, 1.0]
-            # polygons:
-            #     color: red
-            #     order: function() { return feature.sort_rank; }
-    landuse:
+    boundaries:
         data: { source: mapzen }
+        filter:
+          not:
+            - kind_detail: 6
+            - kind_detail: 8
+            - kind: locality
+            - kind: county
+            - maritime_boundary: true
         draw:
-            terrain:
+            dots:
                 order: function() { return feature.sort_rank; }
+                visible: global.lines
+                color: '#B22C18'
+                width: 1.8px
+    places:
+        data: { source: mapzen }
+        filter: { not: { kind: [neighbourhood] } }
+        countries:
+            filter: { kind: country, population: { min: 3500000 } }
+            draw:
+                text:
+                  text_source: function() { return feature["name:en"] || feature["name"]; }
+                  font:
+                    family: Creepster
+                    size: 30px
+                    fill: '#B82D18'
+        cities:
+            filter:
+                - { $zoom: [6], population: { min: 2500000 }}
+                - { $zoom: [7], population: { min: 1500000 } }
+                - { $zoom: [8], min_zoom < 8, kind_detail: city }
+                - { $zoom: [9], min_zoom < 9, kind_detail: city }
+                - { $zoom: [10], min_zoom < 10, kind_detail: city }
+            draw:
+                text:
+                  font:
+                    family: Creepster
+                    size: 24px
+                    fill: '#962825'
+                    stroke: { color: [.185,.118,.038], width: 3}
+        states:
+            filter:
+                - kind_detail: state
+            draw:
+                text:
+                  font:
+                    family: Creepster
+                    size: [[6, 12px], [7,24px], [8, 36px], [9, 44px]]
+                    fill: '#FF7A12'
+                    stroke: { color: [.155,.155,.155], width: 3}
     roads:
         data: { source: mapzen }
         filter: { not: { kind: [rail, ferry] } }
@@ -105,8 +158,6 @@ styles:
         shaders:
             blocks:
                 global: |
-                    // Common Values
-                    //================================
                     float radio = 0.05;
                     vec2 size = vec2(1.,.6);
                     vec3 background = vec3(1.);
@@ -118,6 +169,9 @@ styles:
     buildings:
         base: polygons
         mix: [filter-height]
+    dots:
+        base: lines
+        dash: [1, 2]
     terrain:
         base: polygons
         lighting: false
@@ -126,7 +180,7 @@ styles:
         shaders:
             uniforms:
                 u_scale: 1 # higher values are more exaggerated
-                u_envmap: img/sphere-map1.png
+                u_envmap: img/sphere-map2.png
             blocks:
                 global: |
                     vec4 terrainEnvmap (in sampler2D _tex, in vec3 _normal) {
@@ -149,8 +203,8 @@ styles:
         mix: [space-constant, patterns-stripes]
         shaders:
             defines:
-                COLOR1: vec3(0.490, 0.475, 0.475)
-                COLOR2: vec3(0.380, 0.353, 0.353)
+                COLOR1: vec3(0.25, 0.25, 0.25)
+                COLOR2: vec3(0.69, .69, .69)
             blocks:
                 global: |
                     float stripes2(vec2 st){
@@ -166,3 +220,14 @@ styles:
                     // gradient
                     color.rgb = mix(COLOR1, color.rgb, gl_FragCoord.x / u_resolution.x);
                     color = mix(color,vec4(COLOR2,1.0),stripes(st*92.,.5))*1.0;
+    landuse:
+        base: polygons
+        mix: [patterns-stripes, space-constant]
+        blend: inlay
+        shaders:
+            defines:
+                GRAIN_AMOUNT: 2.
+                NUM_OCTAVES: 2
+            blocks:
+                color: |
+                    color = mix(color,vec4(0.),diagonalStripes( getConstantCoords()*33.))*.8;
