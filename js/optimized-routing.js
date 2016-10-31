@@ -20,9 +20,6 @@ var map = L.Mapzen.map('map', {
   scene: './default.yaml'
 }).setView([37.7627084265813,-100.43644714355469], 5)
 
-L.Mapzen.hash({ map: map });
-
-
 var data = horrorArr;//JSON.parse(request.responseText);
 var waypoints = [];
 var names = [];
