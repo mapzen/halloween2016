@@ -11,6 +11,12 @@ var map = L.Mapzen.map('map', {
   scene: './default.yaml'
 });
 
+map.setView([40.393,-75.289], 7);
+
+L.Mapzen.hash({
+  map: map
+})
+
 
 // Tangram Style objects;
 var ants = {
@@ -105,6 +111,7 @@ function setupRoutingControl () {
     lineOptions: {
       styles: [{ color: '#FFBE12', opacity: 0.7, weight: 7 }]
     },
+    fitSelectedRoutes: false,
     show: (map.getSize().x > 768)? true: false,
     waypoints: routingData.waypoints,
     router: L.Routing.mapzen('matrix-Yxnzyp9', {costing: routingData.costing}),
