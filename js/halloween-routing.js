@@ -11,7 +11,7 @@ var map = L.Mapzen.map('map', {
   scene: './default.yaml'
 });
 
-map.setView([40.393,-75.289], 7);
+(window.innerWidth > 768)? map.setView([40.393,-75.289], 7) : map.setView([40.564,-76.970], 6);
 
 L.Mapzen.hash({
   map: map

@@ -55,10 +55,17 @@
         .leaflet-routing-alt table tr:hover {
             background-color: #B22C18;
         }
+
         .place-names {
             width: 320px;
             background-color: #fff;
             cursor: url('./img/bat.png'), default;
+        }
+        @media (max-width: 768px) {
+            /* hide it when screen is small */
+            .place-names {
+                display: none;
+            }
         }
         .place-names ul {
             padding: 0;
