@@ -22,7 +22,6 @@ fonts:
 cameras:
     cam:
         type: perspective
-
 lights:
     dir:
         type: directional
