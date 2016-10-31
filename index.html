@@ -25,7 +25,21 @@
             position: absolute;
         }
         .point-marker {
-            background-color: #fff;
+            background: url('/img/tombstone.png');
+            background-size: cover;
+            width: 60px;
+            height: 70px;
+            position: relative;
+        }
+        .place-p {
+            width: 80%;
+            text-align: center;
+            font-size: 10px;
+            color: #330000;
+            line-height: 0.85;
+            position: absolute;
+            top: 50%;
+            transform: translate(5px, -50%)
         }
         .leaflet-container {
             font-family: 'Creepster', cursive;
@@ -35,7 +49,9 @@
         }
         .place-names {
             width: 100%;
-            height: 200px;
+            height: 150px;
+            overflow-y: auto;
+
         }
     </style>
   </head>
@@ -45,8 +61,7 @@
     <script src="https://mapzen.com/js/mapzen.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.4/leaflet-routing-machine.min.js"></script>
     <script src="https://unpkg.com/lrm-mapzen@1.1.4/dist/lrm-mapzen.js"></script>
-    <script src="./js/Control.Geocoder.js"></script>
     <script src="./js/mapzen-horror-road-trip.js"></script>
-    <script src="./js/optimized-routing.js"></script>
+    <script src="./js/halloween-routing.js"></script>
   </body>
 </html>
