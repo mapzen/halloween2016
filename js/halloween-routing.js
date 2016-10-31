@@ -137,8 +137,6 @@ setupRoutingControl();
 
 
 function setupRoutingControl () {
-  // These are emojis for markers
-//  var emojis = ['👊', '😃', '🌽', '⭐', '🐟', '🐴', '🐷', '🐔', '😜', '🔥', '🐶', '😮', '👍', '😎', '🏄' ];
   control = L.Routing.control({
     plan: L.Routing.plan(routingData.waypoints, {
       draggableWaypoints: false,
