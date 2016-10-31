@@ -5,8 +5,8 @@ var control;
 var plan;
 
 var map = L.Mapzen.map('map', {
-  minZoom: 4,
-  maxZoom: 15,
+  minZoom: 5,
+  maxZoom: 10,
   scrollWheelZoom: false,
   scene: './default.yaml'
 });
@@ -167,12 +167,12 @@ map.on('tangramloaded', function (e) {
 function makePlaceUl (namearr) {
   var ulNode = document.createElement('ul');
   for ( var i = 0; i < namearr.length; i++) {
-    ulNode.appendChild(makePlaceLi(namearr[i], addrs[i]));
+    ulNode.appendChild(makePlaceLi(namearr[i], addrs[i], waypoints[i]));
   }
   return ulNode;
 }
 
-function makePlaceLi (name, addr) {
+function makePlaceLi (name, addr, waypoint) {
   var lNode = document.createElement('li');
   lNode.classList.add('place')
   var addrNode = document.createElement('div');
@@ -180,6 +180,9 @@ function makePlaceLi (name, addr) {
   addrNode.innerHTML = addr;
   lNode.innerHTML = name;
   lNode.appendChild(addrNode);
+  lNode.onclick = function () {
+    map.setView(waypoint, 10);
+  }
   return lNode;
 }
 
