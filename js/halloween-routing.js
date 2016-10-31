@@ -112,7 +112,8 @@ function setupRoutingControl () {
       styles: [{ color: '#FFBE12', opacity: 0.7, weight: 7 }]
     },
     fitSelectedRoutes: false,
-    show: (map.getSize().x > 768)? true: false,
+    collapsible: (window.innerWidth > 768)? false: true,
+    show: (window.innerWidth > 768)? true: false,
     waypoints: routingData.waypoints,
     router: L.Routing.mapzen('matrix-Yxnzyp9', {costing: routingData.costing}),
     formatter: new L.Routing.mapzenFormatter(),
