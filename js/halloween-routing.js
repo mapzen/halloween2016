@@ -42,13 +42,13 @@ var routeStyle =  {
 var data = horrorArr;//JSON.parse(request.responseText);
 var waypoints = [];
 var names = [];
-var emojis = [];
+var addrs = [];
 // Set up first waypoints data from geojson
 for (var i = 0; i< data.length; i++) {
   var place = data[i];
   waypoints.push(L.latLng(place.lat, place.lng));
   names.push(place.movie);
-
+  addrs.push(place.address);
 }
 
 
@@ -166,15 +166,19 @@ map.on('tangramloaded', function (e) {
 function makePlaceUl (namearr) {
   var ulNode = document.createElement('ul');
   for ( var i = 0; i < namearr.length; i++) {
-    ulNode.appendChild(makePlaceLi(namearr[i]));
+    ulNode.appendChild(makePlaceLi(namearr[i], addrs[i]));
   }
   return ulNode;
 }
 
-function makePlaceLi (name) {
+function makePlaceLi (name, addr) {
   var lNode = document.createElement('li');
   lNode.classList.add('place')
+  var addrNode = document.createElement('div');
+  addrNode.classList.add('place-addr');
+  addrNode.innerHTML = addr;
   lNode.innerHTML = name;
+  lNode.appendChild(addrNode);
   return lNode;
 }
 
