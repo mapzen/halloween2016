@@ -32,7 +32,7 @@ var routeStyle =  {
     "width": "7px"
   },
   "ants": {
-    "color": '#f00',
+    "color": '#B22C18',
     "order": 300000,
     "width": "6px"
   }
@@ -50,6 +50,28 @@ for (var i = 0; i< data.length; i++) {
   names.push(place.movie);
 
 }
+
+
+
+
+// Extra display for movie names and address
+
+var displayList;
+var placeList = L.Control.extend({
+    options: { position: 'topright' },
+    onAdd: function (map) {
+      if(!displayList)
+      {
+        displayList = L.DomUtil.create('div');
+        displayList.classList.add('place-names');
+        displayList.appendChild(makePlaceUl(names));
+      }
+
+      return displayList;
+    }
+  });
+
+map.addControl(new placeList());
 
 
 routingData.waypoints = waypoints;
@@ -86,10 +108,11 @@ function setupRoutingControl () {
     waypoints: routingData.waypoints,
     router: L.Routing.mapzen('matrix-Yxnzyp9', {costing: routingData.costing}),
     formatter: new L.Routing.mapzenFormatter(),
+    pointMarkerStyle:   {radius: 7,color: '#333',fillColor:'#B22C18',opacity: 1,fillOpacity: 0.9},
     summaryTemplate:'<div id="routing-summary" class="info {costing}">{distance}, {time}</div>'
   }).addTo(map);
 
-  L.Routing.errorControl(control).addTo(map);
+  // L.Routing.errorControl(control).addTo(map);
 }
 
 
@@ -140,16 +163,12 @@ map.on('tangramloaded', function (e) {
 });
 
 
-// If you want extra display
-var lrmContainer = document.querySelector('.leaflet-routing-container');
-var places = document.createElement('div');
-
-places.classList.add('place-names');
-if (map.getSize().x > 768) lrmContainer.insertBefore(places, lrmContainer.firstChild);
-
-
-function makePlaceUl () {
-
+function makePlaceUl (namearr) {
+  var ulNode = document.createElement('ul');
+  for ( var i = 0; i < namearr.length; i++) {
+    ulNode.appendChild(makePlaceLi(namearr[i]));
+  }
+  return ulNode;
 }
 
 function makePlaceLi (name) {
