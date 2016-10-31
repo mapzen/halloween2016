@@ -1,5 +1,3 @@
-# Author @patriciogv - 2015
-
 import:
     - https://tangrams.github.io/blocks/global.yaml
     - https://tangrams.github.io/blocks/filter/height.yaml
@@ -11,14 +9,10 @@ import:
 sources:
     mapzen:
         type: TopoJSON
-        # prod
         url:  https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
-        #url:  https://vector.mapzen.com/osm/all/{z}/{x}/{y}.topojson?api_key=vector-tiles-VyYjZGS
-        # dev
-        #url:  https://tile.dev.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson
         rasters: [normals]
         max_zoom: 16
-    normals: # normals
+    normals: 
         type: Raster
         url: https://tile.mapzen.com/mapzen/terrain/v1/normal/{z}/{x}/{y}.png?api_key=vector-tiles-VyYjZGS
         max_zoom: 15
@@ -30,7 +24,6 @@ fonts:
 cameras:
     cam:
         type: perspective
-        # vanishing_point: [0, -500]
 
 lights:
     dir:
