@@ -64,7 +64,7 @@ function setupRoutingControl () {
     }),
     // Draw SVG route while waiting for Tangram to be loaded
     lineOptions: {
-      styles: [{ color: '#FF9412', opacity: 0.9, weight: 7 }]
+      styles: [{ color: '#FFBE12', opacity: 0.9, weight: 7 }]
     },
     show: (map.getSize().x > 768)? true: false,
     waypoints: routingData.waypoints,
