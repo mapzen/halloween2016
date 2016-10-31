@@ -32,7 +32,6 @@ for (var i = 0; i< data.length; i++) {
   var place = data[i];
   waypoints.push(L.latLng(place.lat, place.lng));
   names.push(place.movie);
-
 }
 
 
@@ -52,9 +51,9 @@ function setupRoutingControl () {
       createMarker: function(i, wp, n) {
       // if (i === 0) {
         return L.marker(wp.latLng, {
-          draggable: true,
+          draggable: false,
           icon: new L.divIcon({
-            iconSize: [30, 30],
+            iconSize: [50, 30],
             iconAnchor: [15, 15],
             className: 'point-marker',
             html: names[i]})
